@@ -8,7 +8,6 @@ type CanvasProps = {};
 
 const Canvas: React.FC<CanvasProps> = () => {
     const [pixels, setPixels] = useState(Array(28*28).fill(0));
-    const [isDrawing, setIsDrawing] = useState(false);
 
     const handleMouseDown:Function = (rowIndex:number, columnIndex:number) => {
         const index = rowIndex*28+columnIndex;
@@ -18,22 +17,7 @@ const Canvas: React.FC<CanvasProps> = () => {
             copyOfOldPixels[index] = copyOfOldPixels[index]===1? 0:1;
             return copyOfOldPixels;
         });
-        setIsDrawing(true);
     };
-
-    const handleMouseUp = () => {
-        setIsDrawing(false);
-    };
-
-    const handleMouseMove = useCallback(
-        (rowIndex:number, columnIndex:number) => {
-            const index = rowIndex*28+columnIndex;
-            if (isDrawing) {
-                handleMouseDown(rowIndex, columnIndex);
-            }
-        },
-        [isDrawing],
-    );
 
     const handleClear = () => {
         setPixels(Array(28*28).fill(0));
@@ -51,10 +35,8 @@ const Canvas: React.FC<CanvasProps> = () => {
             const pred:number = res.data;
             console.log(pred);
         }
-        if (!isDrawing) {
-            fetchPrediction(pixels);
-        }
-    }, [pixels, isDrawing]);
+        fetchPrediction(pixels);
+    }, [pixels]);
 
 
     return (
@@ -66,9 +48,7 @@ const Canvas: React.FC<CanvasProps> = () => {
                         {row.map((pixel:number, columnIndex:number)=>(
                             <Pixel key={columnIndex}
                                 colorFlag={pixel} 
-                                onMouseDown={() => {handleMouseDown(rowIndex, columnIndex)}} 
-                                onMouseMove={() => {handleMouseMove(rowIndex, columnIndex)}}
-                                onMouseUp={() => {handleMouseUp()}}/>
+                                onMouseDown={() => {handleMouseDown(rowIndex, columnIndex)}} />
                         ))}
                     </div>
                 );

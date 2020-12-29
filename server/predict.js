@@ -35,6 +35,7 @@ const predictFromArray = async (array) => {
     }
     let image_tensor = tf.tensor(array);
     // Just for test
+    // console.log(image_tensor.shape)
     fs.writeFileSync('./test/test.png', await tf.node.encodePng(image_tensor.mul(255).expandDims(-1)));
     // Just for test
     image_tensor = image_tensor.expandDims(0);
