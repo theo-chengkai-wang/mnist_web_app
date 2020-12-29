@@ -2,13 +2,15 @@
 
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
+/yarn.lock
 
 # testing
 /coverage
 
-# production - note this is different from webpack
-/dist
-/.cache
+# production
+/build
 
 # misc
 .DS_Store

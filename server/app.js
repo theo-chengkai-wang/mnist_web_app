@@ -18,16 +18,26 @@ app.get('/', (req, res) => {
     res.send('Please upload an image file of a single number, with a WHITE BACKGROUND');
 });
 
-app.post('/', upload.single('file'), async (req, res) => {
+app.post('/image', upload.single('file'), async (req, res) => {
     if (!req.file) {
         res.status(400).send("No file uploaded")
     }
     console.log("file name: " + req.file.filename);
     console.log("mimetype: " + req.file.mimetype);
-    const result = await predict(`./uploads/${req.file.filename}`);
+    console.log("reverse color? " + req.body.rev)
+    const result = await predict.predictFromImage(`./uploads/${req.file.filename}`, req.body.rev);
     console.log("result: " + result);
-    res.status(200).send(result);
+    res.json({
+        result: result
+    });
+});
 
+app.post('/array', async(req, res) => {
+    const array = req.body.array;
+    const result = await predict.predictFromArray(array);
+    res.json({
+        result: result
+    });
 })
 
 module.exports = app;
