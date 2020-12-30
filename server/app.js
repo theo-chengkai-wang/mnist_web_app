@@ -34,9 +34,10 @@ app.post('/image', upload.single('file'), async (req, res) => {
 
 app.post('/array', async(req, res) => {
     const array = req.body.array;
-    const result = await predict.predictFromArray(array);
+    const results = await predict.predictFromArray(array);
     res.json({
-        result: result
+        result: results[0],
+        proba: results[1]
     });
 })
 

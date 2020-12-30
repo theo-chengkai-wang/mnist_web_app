@@ -40,8 +40,10 @@ const predictFromArray = async (array) => {
     // Just for test
     image_tensor = image_tensor.expandDims(0);
     const predictions = model.predict(image_tensor).flatten();
+    predictions.print();
     const p = await predictions.argMax().data();
-    return p[0];
+    const proba = await predictions.data();
+    return [p[0], proba[p[0]]];
 }
 // predictFromImage('./test/2.png').then(console.log).catch((reason) => {
 //     if(reason instanceof ModelNotFoundError) {
