@@ -1,15 +1,16 @@
-import React, {useCallback, useState, useEffect} from 'react';
+import React, {useCallback, useState, useEffect, FormEvent, ChangeEventHandler} from 'react';
 import './PredictContainer.css';
 import {chunk} from 'lodash';
 import Canvas from '../components/Canvas';
 import axios, { AxiosResponse } from 'axios';
+import Results, {ResultsProps} from '../components/Results'
 
-type PredictContainerProps = {};
-type FetchedResult = { result: string; proba: number; };
+export type PredictContainerProps = {};
 
+//TODO: Separate train logic with predict logic and instead of just a checkbox, create another route with a router.
 const PredictContainer: React.FC<PredictContainerProps> = () => {
     const [pixels, setPixels] = useState(Array(28*28).fill(0));
-    const [results, setResults] = useState({result:'none', proba: 0});
+    const [results, setResults] = useState({prediction:-1, probability: 0});
 
     const handleMouseDown:Function = (rowIndex:number, columnIndex:number) => {
         const index = rowIndex*28+columnIndex;
@@ -27,7 +28,7 @@ const PredictContainer: React.FC<PredictContainerProps> = () => {
 
     useEffect(() => {
         const fetchPrediction = async (data: number[]) => {
-            const res:AxiosResponse<FetchedResult> = await axios({
+            const res:AxiosResponse<ResultsProps> = await axios({
                 url: '/array',
                 method: 'POST',
                 data: {
@@ -41,14 +42,13 @@ const PredictContainer: React.FC<PredictContainerProps> = () => {
         fetchPrediction(pixels);
     }, [pixels]);
 
-
     return (
         <>
             <Canvas pixels={pixels} onMouseDown={handleMouseDown} />
             <div className="clear-button-wrapper">
                 <button onClick={()=>handleClear()}>Clear</button>
             </div>
-            {JSON.stringify(results)}
+            <Results {...results}/>
         </>
     );
 };
