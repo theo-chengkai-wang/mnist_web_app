@@ -20,9 +20,6 @@ app.get('/', (req, res) => {
 });
 
 app.post('/image', upload.single('file'), async (req, res) => {
-    if (model.mode!==constants.TEST) {
-        model.setMode(constants.TEST);
-    }
     if (!req.file) {
         res.status(400).send("No file uploaded")
     }
@@ -35,22 +32,17 @@ app.post('/image', upload.single('file'), async (req, res) => {
 });
 
 app.post('/array', async(req, res) => {
-    if (model.mode!==constants.TEST) {
-        model.setMode(constants.TEST);
-    }
+
     const array = req.body.array;
     const results = await model.predictFromArray(array);
     res.json(results);
 })
 
-app.post('/arraytrain', async(req, res) => {
-    if (model.mode!==constants.TRAIN) {
-        model.setMode(constants.TRAIN);
-    }
+app.post('/arraytrainlabel', async(req, res) => {
     const array = req.body.array;
     const label = req.body.label;
-    const results = await model.predictFromArray(array, label);
-    res.json(results)
+    const {success, imageId} = model.appendImageLabelCouple(array, label)
+    res.json({success, imageId})
 })
 
 module.exports = app;

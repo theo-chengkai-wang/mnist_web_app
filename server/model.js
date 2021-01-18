@@ -18,26 +18,14 @@ class CNNModel extends EventEmitter {
 
     MODELPATH = null
     model = null
-    TRAINSIZE = 10
+    TRAINSIZE = 0
     imageBatch = []
     imageLabels = []
-    mode = TEST
 
     constructor(modelPath, trainSize=10) {
         super()
         this.MODELPATH = modelPath
         this.TRAINSIZE = trainSize
-    }
-
-    /**
-     * 
-     * @param {string} mode 
-     */
-    setMode(mode) {
-        assert(mode===TEST || mode===TRAIN)
-        this.mode = mode
-        if (mode===TRAIN) this.emit('toggledToTrain')
-        if (mode===TEST) this.emit('toggledToTest')
     }
 
     empty() {
@@ -50,7 +38,7 @@ class CNNModel extends EventEmitter {
         assert(this.MODELPATH!==null, 'MODELPATH is null')
         this.model = await tf.loadLayersModel('file://'+ this.MODELPATH +'/model.json')
         this.model.compile({optimizer: tf.train.adam(), loss: 'categoricalCrossentropy', metrics: ['accuracy']})
-        console.log(new Date().toISOString()+': model loaded, mode: ' + this.mode)
+        this.emit('modelLoaded')
     }
 
     /**
@@ -105,10 +93,9 @@ class CNNModel extends EventEmitter {
     /**
      * 
      * @param {number[][]} array - a 28 by 28 array, with values between 0 and 1.
-     * @param {number} label - -1 if test mode, 0-9 if train mode
      */
-    async predictFromArray(array, label=-1) {
-        assert(this.mode===TEST || label != -1, 'mode is not test and label is -1')
+    async predictFromArray(array) {
+        /*assert(this.mode===TEST || label != -1, 'mode is not test and label is -1')*/
         assert(array.length == 28 && array[0].length == 28, `array doesn't fit`)
         if (this.model == null) {
             await this.loadModel()
@@ -125,7 +112,7 @@ class CNNModel extends EventEmitter {
         const p = await predictions.argMax().data();
         const proba = await predictions.data();
 
-        if (this.mode === TRAIN) {
+        /*if (this.mode === TRAIN) {
             // append image tensor to the batch
             this.imageBatch.push(tf.clone(image_tensor));
             this.imageLabels.push(label);
@@ -138,25 +125,38 @@ class CNNModel extends EventEmitter {
             if(this.imageLabels.length === this.TRAINSIZE) {
                 this.emit('imageBatchFull')
             }
-        }
+        }*/
         return {prediction: p[0], probability: proba[p[0]]};
+    }
+
+    /**
+     * ONLY AVAILABLE ON TRAIN MODE
+     * @param {number[][]} array 28*28 
+     * @param {number} label 0-9
+     */
+    appendImageLabelCouple(array, label) {
+        this.imageLabels.push(label)
+        this.imageBatch.push(tf.tensor(array).expandDims(-1))
+        let imageId = this.imageBatch.length-1
+        this.emit('addedImageToBatch', {
+            imageId: imageId,
+            label: label
+        });
+        if(this.imageLabels.length === this.TRAINSIZE) {
+            this.emit('imageBatchFull')
+        }
+        return {
+           success: true,
+           imageId: imageId 
+        };
     }
 
 }
 
 const instance = new CNNModel(MODELPATH, TRAINSIZE)
 
-instance.on('toggledToTrain', ()=> {
-    console.log(new Date().toISOString(), ': toggled to train')
-    instance.empty()
-}) 
-
-instance.on('toggledToTest', () => {
-    console.log(new Date().toISOString(), ': toggled to test')
-})
-
 instance.on('addedImageToBatch', ({imageId, prediction, label})=> {
-    console.log(new Date().toISOString(), ': added image ', imageId, ' to batch, with prediction: ', prediction, ' compared to answer: ', label)
+    console.log(new Date().toISOString(), ': added image ', imageId, ' to batch', ' compared to answer: ', label)
 })
 
 instance.on('imageBatchFull', async ()=> {
@@ -165,8 +165,13 @@ instance.on('imageBatchFull', async ()=> {
     instance.empty()
 })
 
+instance.on('modelLoaded', () => {
+    console.log(new Date().toISOString()+': model loaded')
+})
+
+
 //Object.freeze(instance)
-module.exports = {constants: {TRAIN, TEST}, model:instance}
+module.exports = {constants: {TRAIN, TEST}, model: instance}
 
 // TEST 
 
@@ -236,7 +241,7 @@ const getImage = async (imagePath, reverseColor=1) => {
 //test()
 
 const test2 = async () => {
-    instance.setMode('TRAIN')
+    testInstance.setMode('TRAIN')
     //let data = tf.stack([await getImage('./1.png', 1), await getImage('./2.png', 1), await getImage('./8.png', 0)])
     // let labels = tf.tensor([1,2,8], null, "int32")
     // await cnnModel.performGradientDescent(train_size, data, labels)
@@ -244,7 +249,7 @@ const test2 = async () => {
         let img = obj.data
         let label = obj.label
         let i = await img.array()
-        await instance.predictFromArray(i, label)
+        await testInstance.predictFromArray(i, label)
     }
 }
 
