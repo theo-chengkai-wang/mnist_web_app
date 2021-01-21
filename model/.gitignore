@@ -1,3 +1,8 @@
 *.png
 .ipynb_checkpoints
+
+yarn.lock
+
 test
+
+ff_model_98.h5

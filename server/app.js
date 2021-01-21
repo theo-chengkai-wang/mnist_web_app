@@ -7,7 +7,8 @@ const upload = multer({
     dest: 'uploads/'
 });
 
-const predict = require('./predict');
+//const predict = require('./predict');
+const {constants, model} = require('./model');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -25,20 +26,23 @@ app.post('/image', upload.single('file'), async (req, res) => {
     console.log("file name: " + req.file.filename);
     console.log("mimetype: " + req.file.mimetype);
     console.log("reverse color? " + req.body.rev)
-    const result = await predict.predictFromImage(`./uploads/${req.file.filename}`, req.body.rev);
+    const {prediction, probability} = await model.predictFromImage(`./uploads/${req.file.filename}`, req.body.rev);
     console.log("result: " + result);
-    res.json({
-        result: result
-    });
+    res.json({prediction, probability});
 });
 
 app.post('/array', async(req, res) => {
+
     const array = req.body.array;
-    const results = await predict.predictFromArray(array);
-    res.json({
-        result: results[0],
-        proba: results[1]
-    });
+    const results = await model.predictFromArray(array);
+    res.json(results);
+})
+
+app.post('/arraytrainlabel', async(req, res) => {
+    const array = req.body.array;
+    const label = req.body.label;
+    const {success, imageId} = model.appendImageLabelCouple(array, label)
+    res.json({success, imageId})
 })
 
 module.exports = app;

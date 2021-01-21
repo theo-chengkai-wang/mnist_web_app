@@ -3,7 +3,7 @@ import {chunk} from 'lodash';
 import Pixel from './Pixel';
 import './Canvas.css';
 
-type CanvasProps = {
+export type CanvasProps = {
     pixels: number[],
     onMouseDown: Function
 }

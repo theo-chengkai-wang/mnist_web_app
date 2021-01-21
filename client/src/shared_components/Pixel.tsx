@@ -7,15 +7,15 @@ type PixelProps = {
 };
 
 const Pixel: React.FC<PixelProps> = ({ colorFlag, onMouseDown }) => {
-    const backgroundColor = colorFlag===1? 'white':'black';
-    const textColor = colorFlag===0? 'white':'black';
+    const color = colorFlag===1? 'white':'black';
+    //const textColor = colorFlag===0? 'white':'black';
     const handleMouseDown: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
         onMouseDown();
     };
     return (
         // Set color and backgroundColor to be the same, so never sees the content of a cell
         <button className="pixel-button" 
-            style={{backgroundColor: backgroundColor, color: textColor}} 
+            style={{backgroundColor: color, color: color}} 
             onMouseDown={handleMouseDown} >
             {colorFlag}
         </button>
