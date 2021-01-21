@@ -1,6 +1,8 @@
 *.png
 .ipynb_checkpoints
-test/saved_model
-test/node_modules
-test/cnn_model
+
 yarn.lock
+
+test
+
+ff_model_98.h5
