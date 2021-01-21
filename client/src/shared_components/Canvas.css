@@ -1,0 +1,9 @@
+.display-row{
+    display: flex;
+    width: fit-content;
+    flex-direction: row;
+}
+
+.Canvas{
+    
+}

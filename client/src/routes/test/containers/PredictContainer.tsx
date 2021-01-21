@@ -3,8 +3,8 @@ import './PredictContainer.css';
 import {chunk} from 'lodash';
 //import Canvas from '../components/Canvas';
 import axios, { AxiosResponse } from 'axios';
-import {ResultsProps} from '../../components/Results'
-import CanvasWithResults from '../../components/CanvasWithResults'
+import {ResultsProps} from '../../../shared_components/Results'
+import CanvasTest from '../components/CanvasTest'
 import {RouteComponentProps} from '@reach/router'
 
 
@@ -46,14 +46,14 @@ const PredictContainer: React.FC<PredictContainerProps> = () => {
     }, [pixels]);
 
     return (
-        <>
+        <div>
             {/* <Canvas pixels={pixels} onMouseDown={handleMouseDown} />
             <div className="clear-button-wrapper">
                 <button onClick={()=>handleClear()}>Clear</button>
             </div>
             <Results {...results}/> */}
-            <CanvasWithResults canvas={{pixels: pixels, onMouseDown: handleMouseDown}} results={results} onClear={()=>handleClear()} />
-        </>
+            <CanvasTest canvas={{pixels: pixels, onMouseDown: handleMouseDown}} results={results} onClear={()=>handleClear()} />
+        </div>
     );
 };
 

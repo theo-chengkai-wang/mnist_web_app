@@ -4,9 +4,8 @@ import { RouteComponentProps } from '@reach/router'
 import {chunk, toInteger} from 'lodash';
 //import Canvas from '../components/Canvas';
 import axios, { AxiosResponse } from 'axios';
-import {ResultsProps} from '../../components/Results'
-import CanvasWithResults from '../../components/CanvasWithResults'
-import Training from '../../components/Training';
+import {ResultsProps} from '../../../shared_components/Results'
+import CanvasTrain from '../components/CanvasTrain'
 
 // TODO: ADD CSS
 // TODO: Clean up code
@@ -17,8 +16,10 @@ const TrainContainer: React.FC<TrainContainerProps> = () => {
     const [pixels, setPixels] = useState(Array(28*28).fill(0));
     const [results, setResults] = useState({prediction:-1, probability: 0});
     const [givenLabel, setGivenLabel] = useState(0);
+    const [isUploaded, setIsUploaded] = useState(false);
 
     const handleMouseDown:Function = (rowIndex:number, columnIndex:number) => {
+        setIsUploaded(false);
         const index = rowIndex*28+columnIndex;
         setPixels((oldPixelValue:number[])=>{
             const copyOfOldPixels = oldPixelValue.slice();
@@ -29,6 +30,7 @@ const TrainContainer: React.FC<TrainContainerProps> = () => {
     };
 
     const handleClear = () => {
+        setIsUploaded(false);
         setPixels(Array(28*28).fill(0));
     };
 
@@ -62,17 +64,23 @@ const TrainContainer: React.FC<TrainContainerProps> = () => {
             })
             const results = res.data;
             console.log(results)
+            setIsUploaded(results['success'])
         },
         [pixels, givenLabel],
     )
 
     const handleChoiceChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        setIsUploaded(false)
         setGivenLabel(toInteger(e.target.value))
     }
     return (
         <>
-            <CanvasWithResults canvas={{pixels: pixels, onMouseDown: handleMouseDown}} results={results} onClear={()=>handleClear()} />
-            <Training onSubmit={handleSubmit} onChange={handleChoiceChange} value={givenLabel}/>
+            <CanvasTrain canvas={{pixels: pixels, onMouseDown: handleMouseDown}} 
+                results={results} 
+                train={{onSubmit:handleSubmit, onChange:handleChoiceChange, isUploaded: isUploaded, value:givenLabel}}
+                onClear={()=>handleClear()}
+            />
+            {/* <Training onSubmit={handleSubmit} onChange={handleChoiceChange} value={givenLabel}/> */}
         </>
     )
 }

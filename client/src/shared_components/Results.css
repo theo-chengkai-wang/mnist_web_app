@@ -1,0 +1,18 @@
+.prediction p {
+    padding: 0%;
+    margin: 0%;
+    font-size: 10vh;
+    font-weight: 100;
+}
+
+.prediction h3 {
+    margin: 0%;
+    font: bold;
+}
+
+.probability p {
+    padding: 0%;
+    margin: 0%;
+    font-size: 5vh;
+    font-weight: 100;
+}

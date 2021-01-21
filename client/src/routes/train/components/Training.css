@@ -1,0 +1,36 @@
+#train-form-wrapper {
+    padding-top: 10%;
+
+}
+
+#train-form-wrapper form {
+    display: flex;
+}
+
+#train-form-wrapper select {
+    margin-right: 10px;
+    padding: 10px;
+    padding-right: 50px;
+    font-size:larger;
+    text-align: center;
+}
+
+#train-form-wrapper input {
+    min-height: 100%;
+    border-color: darkblue;
+    border-radius: 10%;
+    border-style: solid;
+    color: darkblue;
+    background-color: white;
+}
+
+#train-form-wrapper input:hover{
+    color:white;
+    background-color: darkblue;
+    font-weight: 500;
+}
+
+.success {
+    font-weight: 100;
+    font-style: italic; 
+}
